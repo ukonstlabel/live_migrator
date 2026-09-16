@@ -1,0 +1,40 @@
+services:
+  # The main service - runs continuously
+  service:
+    build:
+      context: ..
+      dockerfile: examples/Dockerfile
+      target: service
+    container_name: migrator-service
+    ports:
+      - "8080:8080"
+    # Share /tmp for Java Attach API socket
+    volumes:
+      - attach-socket:/tmp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Migration container - started on demand, stops after migration
+  migrator:
+    build:
+      context: ..
+      dockerfile: examples/Dockerfile
+      target: migrator
+    container_name: migrator-agent
+    # Share PID namespace with service for Java Attach API
+    pid: "service:service"
+    # Share /tmp for attach socket
+    volumes:
+      - attach-socket:/tmp
+    depends_on:
+      service:
+        condition: service_healthy
+    # Container exits after migration completes
+    profiles:
+      - migrate
+
+volumes:
+  attach-socket:

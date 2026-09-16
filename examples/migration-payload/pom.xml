@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>live.migrator</groupId>
+        <artifactId>live-migrator-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>migration-payload</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Core migrator framework -->
+        <dependency>
+            <groupId>live.migrator</groupId>
+            <artifactId>live-migrator</artifactId>
+        </dependency>
+        <!-- Service classes (OldUser, User interface) - needed for migration -->
+        <dependency>
+            <groupId>live.migrator</groupId>
+            <artifactId>service-demo</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Enforce migration config file exists (properties or yml) -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-migration-config</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <condition property="config.exists">
+                                    <or>
+                                        <available file="${project.basedir}/src/main/resources/migration.properties"/>
+                                        <available file="${project.basedir}/src/main/resources/migration.yml"/>
+                                    </or>
+                                </condition>
+                                <fail unless="config.exists">
+Migration configuration file is required!
+Please create one of:
+  - src/main/resources/migration.properties
+  - src/main/resources/migration.yml
+
+See migrator.config.MigrationConfigLoader for format details.
+                                </fail>
+                                <echo>Found migration configuration file.</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Agent-Class>migration.MigrationAgent</Agent-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Agent-Class>migration.MigrationAgent</Agent-Class>
+                                        <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                                        <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!-- Exclude demo classes from live-migrator that conflict -->
+                                    <artifact>live.migrator:live-migrator</artifact>
+                                    <excludes>
+                                        <exclude>UserMigrator.class</exclude>
+                                        <exclude>OldUser.class</exclude>
+                                        <exclude>NewUser.class</exclude>
+                                        <exclude>User.class</exclude>
+                                        <exclude>Register.class</exclude>
+                                        <exclude>TestPhaseListener.class</exclude>
+                                        <exclude>TestRegistry.class</exclude>
+                                        <exclude>NoopCommitManager.class</exclude>
+                                        <exclude>NoopCommitManager$*.class</exclude>
+                                        <exclude>NoopRollbackManager.class</exclude>
+                                        <exclude>NoopRollbackManager$*.class</exclude>
+                                        <exclude>UserReferenceZoo*.class</exclude>
+                                        <exclude>UserSmokeTest.class</exclude>
+                                        <exclude>Main.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

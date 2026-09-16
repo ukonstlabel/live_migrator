@@ -1,0 +1,36 @@
+# Build output
+target/
+
+# Native agent build artifacts
+agent/*.so
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*
+
+# Documentation
+docs/
+
+# reproducibility bundles
+tests/repro/out/
+tests/e2e/out/

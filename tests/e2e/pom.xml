@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>live.migrator</groupId>
+        <artifactId>live-migrator-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>live-migrator-e2e</artifactId>
+    <name>Live Migrator :: E2E load harness</name>
+    <description>
+        End-to-end load harness: an open-loop generator (coordinated-omission safe) plus
+        timeline export, to compare client-visible downtime and the JIT-warmup tail across
+        update strategies under load. Pure JDK, no external dependencies.
+    </description>
+
+    <build>
+        <finalName>e2e-loadgen</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>migrator.e2e.LoadGenerator</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

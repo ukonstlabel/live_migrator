@@ -1,0 +1,25 @@
+# Build outputs
+**/target/
+**/*.class
+**/*.so
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Local files
+*.dump
+*.log
+
+# Shell scripts (not needed inside Docker build, except migrate.sh)
+examples/*.sh
+!examples/migrate.sh
+
+# Documentation
+*.md
+docs/
